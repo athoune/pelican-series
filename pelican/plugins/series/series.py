@@ -16,16 +16,6 @@ ordered_articles_all = {}
 ordered_pages_all = {}
 
 
-class Series:
-    def __init__(self, series: dict):
-        self._series = series
-
-    def __getitem__(self, key: str):
-        if key == "l10n":
-            return dict(en=self._series)
-        return self._series.get(key)
-
-
 def generate_serie(series_name, series_items, sort_key):
     forced_order_items = [i for i in series_items if i["index"] != 0]
     forced_order_items.sort(key=itemgetter("index"))
@@ -37,7 +27,7 @@ def generate_serie(series_name, series_items, sort_key):
     ordered_items = [i["content"] for i in all_items]
 
     for index, page in enumerate(ordered_items):
-        series = {
+        page.series = {
             "name": series_name,
             "index": index + 1,
             "all": ordered_items,
@@ -47,16 +37,14 @@ def generate_serie(series_name, series_items, sort_key):
         }
 
         if index > 0:
-            series["previous"] = ordered_items[index - 1]
+            page.series["previous"] = ordered_items[index - 1]
         else:
-            series["previous"] = None
+            page.series["previous"] = None
 
         try:
-            series["next"] = ordered_items[index + 1]
+            page.series["next"] = ordered_items[index + 1]
         except IndexError:
-            series["next"] = None
-
-        page.series = Series(series)
+            page.series["next"] = None
 
     return ordered_items
 
